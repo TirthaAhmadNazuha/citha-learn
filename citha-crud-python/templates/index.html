@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    h1,
+    h2,
+    h3,
+    p,
+    span {
+      padding: 0;
+      margin: 0;
+      border: 0;
+    }
+
+    .container {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #insetForm {
+      margin-top: 30px;
+      display: flex;
+      text-align: left;
+    }
+
+    label {
+      padding: 10px;
+
+    }
+
+    input {
+      border: 1px solid black;
+      padding: 20 px;
+    }
+
+    th,
+    td {
+      padding: 3px 12px;
+    }
+
+    #modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0007;
+      display: none;
+    }
+
+    #modal .con {
+      background: #fff;
+      padding: 32px;
+      display: inline-block;
+      margin-top: 50%;
+    }
+
+    #modal:target {
+      display: block;
+    }
+
+    #updateForm {
+      text-align: left;
+    }
+
+    #updateForm input {
+      margin: 5px 0;
+    }
+
+    #updateForm button {
+      text-align: center;
+    }
+
+    .btn-con {
+      margin-top: 5px;
+      display: flex;
+      justify-content: end;
+      gap: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>MASUKAN DATA MAHASISWA</h1>
+    <form id="insetForm" action="/add" method="post">
+      <div class="col1">
+        <label>Nama :</label><br>
+        <label>No Telfon :</label><br>
+        <label>Alamat :</label><br>
+      </div>
+      <div class="col2">
+        <input name="nama"><br>
+        <input name="noTelp"><br>
+        <input name="alamat">
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+
+    <table border="2">
+      <thead>
+        <tr>
+          <th>nim</th>
+          <th>nama</th>
+          <th>aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+
+    <div class="view"></div>
+
+    <div id="modal">
+      <div class="con">
+        <form id="updateForm" action="/update" method="POST">
+          <input type="hidden" name="nim" /><br>
+          <label>nama :</label><br>
+          <input type="text" name="nama" /><br>
+          <label>no telfon :</label><br>
+          <input type="text" name="noTelp" /><br>
+          <label>alamat :</label><br>
+          <input type="text" name="alamat" /><br>
+          <div class="btn-con">
+            <button type="submit">Update</button>
+            <a href="#">close</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    const update = async (nim) => {
+      const from = document.getElementById('updateForm');
+      const { mahasiswa } = await fetch(`/mahasiswa/${nim}`).then((res) => res.json());
+      console.log(from);
+      from.nim.value = mahasiswa.nim;
+      from.nama.value = mahasiswa.nama;
+      from['noTelp'].value = mahasiswa['noTelp'];
+      from.alamat.value = mahasiswa.alamat;
+    };
+    const views = async (nim) => {
+      const view = document.querySelector('.view');
+      const { mahasiswa } = await fetch(`/mahasiswa/${nim}`).then((res) => res.json());
+      view.innerHTML = `
+        <h1>${mahasiswa.nama}</h1>
+        <h2>${mahasiswa.nim}</h2>
+        <h3>${mahasiswa['noTelp']}</h3>
+        <h4>${mahasiswa.alamat}</h4>
+      `;
+    };
+    const main = async () => {
+      const data = await fetch('/mahasiswa').then((res) => res.json());
+      const tbody = document.querySelector('table > tbody');
+      console.log(data);
+
+      const btnAksi = (nim) => (`
+        <td>
+        <button onclick="views(${nim})">
+          view
+        </button>
+        <a href="#modal" onclick="update(${nim})">Update</a>
+        </td>
+          `);
+
+      data.mahasiswa.forEach(mahasiswa => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${mahasiswa.nim}</td>
+            <td>${mahasiswa.nama}</td>
+            ${btnAksi(mahasiswa.nim)}
+          </tr>
+        `;
+      });
+    };
+    document.addEventListener('DOMContentLoaded', main)
+  </script>
+</body>
+
+</html>

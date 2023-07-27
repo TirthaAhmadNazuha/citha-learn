@@ -1,0 +1,6 @@
+"ini string",1
+"ini string 2",2
+"ini string 3",3
+"ini string 4",4
+"ini string 5",5
+"ini string 6",6
